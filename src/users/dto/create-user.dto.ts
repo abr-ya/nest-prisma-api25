@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { UserRoleType } from './users.types';
 
