@@ -1,39 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UserRoleType } from './users.types';
+import { UserRoleType } from './dto/users.types';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user-dto';
 
 @Injectable()
 export class UsersService {
   private users = [
-    {
-      id: 1,
-      name: 'Leanne Graham',
-      email: 'Sincere@april.biz',
-      role: 'BASIC',
-    },
-    {
-      id: 2,
-      name: 'Ervin Howell',
-      email: 'Shanna@melissa.tv',
-      role: 'BASIC',
-    },
-    {
-      id: 3,
-      name: 'Clementine Bauch',
-      email: 'Nathan@yesenia.net',
-      role: 'MODERATOR',
-    },
-    {
-      id: 4,
-      name: 'Patricia Lebsack',
-      email: 'Julianne.OConner@kory.org',
-      role: 'MODERATOR',
-    },
-    {
-      id: 5,
-      name: 'Chelsey Dietrich',
-      email: 'Lucio_Hettinger@annie.ca',
-      role: 'ADMIN',
-    },
+    { id: 1, name: 'Leanne Graham', email: 'Sincere@april.biz', role: 'BASIC' },
+    { id: 2, name: 'Ervin Howell', email: 'Shanna@melissa.tv', role: 'BASIC' },
+    { id: 3, name: 'Clementine Bauch', email: 'Nathan@yesenia.net', role: 'MODERATOR' },
+    { id: 4, name: 'Patricia Lebsack', email: 'Julianne.OConner@kory.org', role: 'MODERATOR' },
+    { id: 5, name: 'Chelsey Dietrich', email: 'Lucio_Hettinger@annie.ca', role: 'ADMIN' },
   ];
 
   findAll(role?: UserRoleType) {
@@ -49,17 +26,17 @@ export class UsersService {
     return user;
   }
 
-  create(userData: { name: string; email: string; role: UserRoleType }) {
+  create(createUserDto: CreateUserDto) {
     const usersByHighestId = [...this.users].sort((a, b) => b.id - a.id);
-    const newUser = { id: usersByHighestId[0].id + 1, ...userData };
+    const newUser = { id: usersByHighestId[0].id + 1, ...createUserDto };
     this.users.push(newUser);
 
     return newUser;
   }
 
-  update(id: number, newUserData: { name?: string; email?: string; role?: UserRoleType }) {
+  update(id: number, updateUserDto: UpdateUserDto) {
     this.users = this.users.map((user) => {
-      if (user.id === id) return { ...user, ...newUserData };
+      if (user.id === id) return { ...user, ...updateUserDto };
       return user;
     });
 
