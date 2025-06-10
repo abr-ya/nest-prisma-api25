@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { Prisma } from '@prisma/client';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-user-dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  create(@Body() createPostDto: Prisma.BlogPostCreateInput) {
+  create(@Body(ValidationPipe) createPostDto: CreatePostDto) {
     return this.postsService.create(createPostDto);
   }
 
@@ -22,7 +23,7 @@ export class PostsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: Prisma.BlogPostUpdateInput) {
+  update(@Param('id') id: string, @Body(ValidationPipe) updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
   }
 

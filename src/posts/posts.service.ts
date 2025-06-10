@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-user-dto';
 
 const DEMO = [
   '0d39e19b-ec38-4e39-92f8-e7d2896de634',
@@ -13,7 +14,7 @@ const DEMO = [
 export class PostsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(createPostDto: Prisma.BlogPostCreateInput) {
+  async create(createPostDto: CreatePostDto) {
     return this.databaseService.blogPost.create({ data: createPostDto });
   }
 
@@ -22,15 +23,24 @@ export class PostsService {
   }
 
   async findOne(id: string) {
-    return this.databaseService.blogPost.findUnique({ where: { id } });
+    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    if (!post) throw new NotFoundException('Post Not Found');
+
+    return post;
   }
 
-  async update(id: string, updatePostDto: Prisma.BlogPostUpdateInput) {
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    if (!post) throw new NotFoundException(`Post ${id} not found!`);
+
     return this.databaseService.blogPost.update({ where: { id }, data: updatePostDto });
   }
 
   async remove(id: string) {
     if (DEMO.includes(id)) throw new NotFoundException('This is protected post!');
+
+    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    if (!post) throw new NotFoundException(`Post ${id} not found!`);
 
     return this.databaseService.blogPost.delete({ where: { id } });
   }
