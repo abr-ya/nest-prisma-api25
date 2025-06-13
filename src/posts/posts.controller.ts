@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } fro
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-user-dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -22,6 +23,7 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @Auth()
   @Patch(':id')
   update(@Param('id') id: string, @Body(ValidationPipe) updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);

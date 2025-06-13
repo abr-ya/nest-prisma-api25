@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
+import { PrismaService } from 'src/database/database.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-user-dto';
 
@@ -12,36 +12,36 @@ const DEMO = [
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly PrismaService: PrismaService) {}
 
   async create(createPostDto: CreatePostDto) {
-    return this.databaseService.blogPost.create({ data: createPostDto });
+    return this.PrismaService.blogPost.create({ data: createPostDto });
   }
 
   async findAll() {
-    return this.databaseService.blogPost.findMany();
+    return this.PrismaService.blogPost.findMany();
   }
 
   async findOne(id: string) {
-    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    const post = await this.PrismaService.blogPost.findUnique({ where: { id } });
     if (!post) throw new NotFoundException('Post Not Found');
 
     return post;
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
-    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    const post = await this.PrismaService.blogPost.findUnique({ where: { id } });
     if (!post) throw new NotFoundException(`Post ${id} not found!`);
 
-    return this.databaseService.blogPost.update({ where: { id }, data: updatePostDto });
+    return this.PrismaService.blogPost.update({ where: { id }, data: updatePostDto });
   }
 
   async remove(id: string) {
     if (DEMO.includes(id)) throw new NotFoundException('This is protected post!');
 
-    const post = await this.databaseService.blogPost.findUnique({ where: { id } });
+    const post = await this.PrismaService.blogPost.findUnique({ where: { id } });
     if (!post) throw new NotFoundException(`Post ${id} not found!`);
 
-    return this.databaseService.blogPost.delete({ where: { id } });
+    return this.PrismaService.blogPost.delete({ where: { id } });
   }
 }

@@ -1,56 +1,42 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserRoleType } from './dto/users.types';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user-dto';
+import { Injectable } from '@nestjs/common';
+
+import { hash } from 'argon2';
+import { AuthDto } from 'src/auth/dto/auth.dto';
+import { PrismaService } from 'src/database/database.service';
 
 @Injectable()
 export class UsersService {
-  private users = [
-    { id: 1, name: 'Leanne Graham', email: 'Sincere@april.biz', role: 'BASIC' },
-    { id: 2, name: 'Ervin Howell', email: 'Shanna@melissa.tv', role: 'BASIC' },
-    { id: 3, name: 'Clementine Bauch', email: 'Nathan@yesenia.net', role: 'MODERATOR' },
-    { id: 4, name: 'Patricia Lebsack', email: 'Julianne.OConner@kory.org', role: 'MODERATOR' },
-    { id: 5, name: 'Chelsey Dietrich', email: 'Lucio_Hettinger@annie.ca', role: 'ADMIN' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(role?: UserRoleType) {
-    if (role) {
-      const rolesUsers = this.users.filter((user) => user.role === role);
-      if (rolesUsers.length === 0) throw new NotFoundException('User Role Not Found');
-      return rolesUsers;
-    }
-
-    return this.users;
-  }
-
-  findOne(id: number) {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) throw new NotFoundException('User Not Found');
+  async getById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
     return user;
   }
 
-  create(createUserDto: CreateUserDto) {
-    const usersByHighestId = [...this.users].sort((a, b) => b.id - a.id);
-    const newUser = { id: usersByHighestId[0].id + 1, ...createUserDto };
-    this.users.push(newUser);
-
-    return newUser;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    this.users = this.users.map((user) => {
-      if (user.id === id) return { ...user, ...updateUserDto };
-      return user;
+  async getByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
     });
 
-    return this.findOne(id);
+    return user;
   }
 
-  delete(id: number) {
-    const userToRemove = this.findOne(id);
-    this.users = this.users.filter((user) => user.id !== id);
-
-    return userToRemove;
+  async create(dto: AuthDto) {
+    return this.prisma.user.create({
+      data: {
+        id: `nest_${dto.email}`,
+        firstName: dto.name,
+        lastName: '',
+        email: dto.email,
+        password: await hash(dto.password),
+      },
+    });
   }
 }
